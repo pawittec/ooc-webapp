@@ -5,6 +5,7 @@
  */
 package io.muic.ooc.webapp.servlet;
 
+import io.muic.ooc.webapp.service.SecurityService;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,6 +20,8 @@ import org.apache.commons.lang.StringUtils;
  */
 public class LoginServlet extends HttpServlet {
 
+    private SecurityService securityService;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/login.jsp");
@@ -32,8 +35,14 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
-            RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/login.jsp");
-            rd.include(request, response);
+            if (securityService.authenticate(username, password, request)) {
+                response.sendRedirect("/");
+            } else {
+                String error = "Wrong username or password.";
+                request.setAttribute("error", error);
+                RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/login.jsp");
+                rd.include(request, response);
+            }
         } else {
             String error = "Username or password is missing.";
             request.setAttribute("error", error);
@@ -44,7 +53,10 @@ public class LoginServlet extends HttpServlet {
         // check username and password against database
         // if valid then set username attribute to session via securityService
         // else put error message to render error on the login form
-        //RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/login.jsp");
-        //rd.include(request, response);
+
+    }
+
+    public void setSecurityService(SecurityService securityService) {
+        this.securityService = securityService;
     }
 }

@@ -37,6 +37,7 @@ public class ServletRouter {
 
     private void initLogin(Context ctx) {
         LoginServlet loginServlet = new LoginServlet();
+        loginServlet.setSecurityService(securityService);
         Tomcat.addServlet(ctx, "LoginServlet", loginServlet);
         ctx.addServletMapping("/login", "LoginServlet");
     }
