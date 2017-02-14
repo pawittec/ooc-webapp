@@ -1,12 +1,8 @@
 package io.muic.ooc.webapp;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.muic.ooc.webapp.service.SecurityService;
 import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
+import javax.servlet.ServletException;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -15,44 +11,26 @@ import org.apache.catalina.startup.Tomcat;
  * Created by gigadot on 02-Feb-17.
  */
 public class Webapp {
-    public static void main(String[] args) throws LifecycleException,
-            InterruptedException, ServletException {
+
+    public static void main(String[] args) {
 
         String docBase = "src/main/webapp/";
         Tomcat tomcat = new Tomcat();
         tomcat.setPort(8082);
+        SecurityService securityService = new SecurityService();
 
-        Context ctx = tomcat.addContext("/", new File(".").getAbsolutePath());
+        ServletRouter servletRouter = new ServletRouter();
+        servletRouter.setSecurityService(securityService);
 
-        Tomcat.addServlet(ctx, "Embedded", new HttpServlet() {
-            @Override
-            protected void service(HttpServletRequest req, HttpServletResponse resp)
-                    throws ServletException, IOException {
+        Context ctx;
+        try {
+            ctx = tomcat.addWebapp("/", new File(docBase).getAbsolutePath());
+            servletRouter.init(ctx);
+            tomcat.start();
+            tomcat.getServer().await();
+        } catch (ServletException | LifecycleException ex) {
+            ex.printStackTrace();
+        }
 
-                Writer w = resp.getWriter();
-                w.write("Embedded.\n");
-                w.flush();
-                w.close();
-            }
-        });
-
-        Tomcat.addServlet(ctx, "Hello", new HttpServlet() {
-            @Override
-            protected void service(HttpServletRequest req, HttpServletResponse resp)
-                    throws ServletException, IOException {
-
-                Writer w = resp.getWriter();
-                w.write("Hello.\n");
-                w.flush();
-                w.close();
-            }
-        });
-
-        ctx.addServletMapping("/hellox", "Hello");
-        ctx.addServletMapping("/", "Embedded");
-
-        tomcat.addWebapp("/webapp", new File(docBase).getAbsolutePath());
-        tomcat.start();
-        tomcat.getServer().await();
     }
 }
