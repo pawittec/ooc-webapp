@@ -27,6 +27,10 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // do login post logic
+        // extract username and password from request
+        // check username and password against database
+        // if valid then set username attribute to session via securityService
+        // else put error message to render error on the login form
         RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/login.jsp");
         rd.include(request, response);
     }
