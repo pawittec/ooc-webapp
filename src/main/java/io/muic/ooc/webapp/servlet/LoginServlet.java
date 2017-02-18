@@ -24,6 +24,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getSession().invalidate();
         RequestDispatcher rd = request.getRequestDispatcher("WEB-INF/login.jsp");
         rd.include(request, response);
     }
@@ -36,6 +37,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         if (!StringUtils.isBlank(username) && !StringUtils.isBlank(password)) {
             if (securityService.authenticate(username, password, request)) {
+                request.getSession().setAttribute("username",username);
                 response.sendRedirect("/");
             } else {
                 String error = "Wrong username or password.";

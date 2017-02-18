@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
  * @author gigadot
  */
 public class SecurityService {
+    private SQLService sql = new SQLService("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/sys");
     
     private Map<String, String> userCredentials = new HashMap<String, String>() {{
         put("admin", "123456");
@@ -25,18 +26,15 @@ public class SecurityService {
         String username = (String) request.getSession()
                 .getAttribute("username");
         // do checking
-       return (username != null && userCredentials.containsKey(username));
+        System.out.println(username);
+       return (username != null );
     }
     
     public boolean authenticate(String username, String password, HttpServletRequest request) {
-        String passwordInDB = userCredentials.get(username);
-        boolean isMatched = StringUtils.equals(password, passwordInDB);
-        if (isMatched) {
-            request.getSession().setAttribute("username", username);
-            return true;
-        } else {
-            return false;
-        }
+        String user = request.getParameter("username");
+        String pass = request.getParameter("password");
+        boolean check = sql.getData(user,pass);
+        return check;
     }
     
     public void logout(HttpServletRequest request) {

@@ -9,7 +9,10 @@
             Password:<br/>
             <input type="password" name="password">
             <br><br>
-            <input type="submit" value="Submit">
-        </form> 
+            <input type="submit" value="Login">
+        </form>
+        <form action="/register" method="get">
+            <input type="submit" value="Register">
+        </form>
     </body>
 </html>
